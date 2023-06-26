@@ -58,14 +58,25 @@ export const fetchPassenger = () => {
      payload: selectedPassengerId
   })  
 }} 
+
+
   
 
   export const editPassenger = (passengerId) => {
+    console.log(passengerId , " id from action ")
     return {
       type: 'EDIT_PASSENGER',
       payload: passengerId,
     };
   };
+
+  export const setFilteredPassengers = (filteredPassengers) => {
+    return {
+      type: 'SET_FILTERED_PASSENGERS',
+      payload: filteredPassengers,
+    };
+  };
+  
 
   export const cancelEdit = (passengerId) => {
     return {
@@ -74,10 +85,6 @@ export const fetchPassenger = () => {
     };
   };
 
-  // export const deletePassenger = (passengerId) => ({
-  //   type: 'DELETE_PASSENGER',
-  //   payload: passengerId,
-  // });
 
  
   

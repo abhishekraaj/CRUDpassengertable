@@ -1,9 +1,12 @@
 const initialState = {
-    passengers: [],
+    passengers: {
+        data: [],
+    },
+    filteredPassengers: [],
     error: null,
     loading: true,
-    isEdit: false
 };
+
 
 const rootReducer = (state = initialState, action) => {
     switch (action.type) {
@@ -61,59 +64,55 @@ const rootReducer = (state = initialState, action) => {
                 error: action.payload,
             };
 
-        // case 'DELETE_PASSENGER':
-        //     console.log("Hello from reducer-users")
-        //     console.log(state.passengers.data, " hii...")
-        //     const filteredPassenger = state.passengers.data.filter(
-        //         (passenger) => passenger.id !== action.payload
-        //     );
-        //     return {
-        //         ...state,
-        //         passengers: filteredPassenger,
-        //         error: null,
-        //     }
 
         case 'DELETE_PASSENGER':
             console.log("Hello from reducer-users");
             console.log(state.passengers.data, "hii...");
             const filteredPassenger = state.passengers.data.filter(
-              (passenger) => passenger._id !== action.payload
+                (passenger) => passenger._id !== action.payload
             );
             console.log(filteredPassenger, "deleted");
             return {
-              ...state,
-              passengers: {
-                ...state.passengers,
-                data: filteredPassenger,
-              },
-              error: null,
-            };
-          
-
-        case 'EDIT_PASSENGER':
-            return {
                 ...state,
                 passengers: {
                     ...state.passengers,
-                    data: state.passengers.data.map((passenger) =>
-                        passenger._id === action.payload ? { ...passenger, isEdit: true } : passenger
-                    ),
+                    data: filteredPassenger,
                 },
-                isEdit: true,
+                error: null,
             };
 
-        case 'CANCEL_EDIT':
-            return {
-                ...state,
-                passengers: {
+
+
+
+            case 'EDIT_PASSENGER':
+                return {
+                  ...state,
+                  passengers: {
                     ...state.passengers,
                     data: state.passengers.data.map((passenger) =>
-                        passenger._id === action.payload ? { ...passenger, isEdit: false } : passenger
+                      passenger._id === action.payload ? { ...passenger, isEdit: true } : { ...passenger, isEdit: false }
                     ),
-                },
-                isEdit: false,
-            };
+                  },
 
+            
+                  filteredPassengers: state.filteredPassengers.map((passenger) =>
+                    passenger._id === action.payload ? { ...passenger, isEdit: true } : passenger
+                  ),
+                };
+              
+              case 'CANCEL_EDIT':
+                return {
+                  ...state,
+                  passengers: {
+                    ...state.passengers,
+                    data: state.passengers.data.map((passenger) =>
+                      passenger._id === action.payload ? { ...passenger, isEdit: false } : passenger
+                    ),
+                  },
+                 
+                };
+              
+                  
 
 
 
