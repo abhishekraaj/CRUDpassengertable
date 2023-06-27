@@ -25,13 +25,13 @@ export const fetchPassenger = () => {
 
 
 
-  export const updatePassenger = (id, data, airline) => {
+  export const updatePassenger = (id, data, airline ) => {
     console.log(id, "new data from update passenger");
     console.log(data, "data from action");
     console.log(airline, "airline data");
   
     return dispatch => {
-      axios.put(`https://api.instantwebtools.net/v1/passenger/${id}`, { ...data, airline })
+      axios.put(`https://api.instantwebtools.net/v1/passenger/${id}`, { ...data, airline})
         .then(response => {
           console.log(response.data, 'data update successfully');
   
@@ -70,12 +70,13 @@ export const fetchPassenger = () => {
     };
   };
 
-  export const setFilteredPassengers = (filteredPassengers) => {
-    return {
-      type: 'SET_FILTERED_PASSENGERS',
-      payload: filteredPassengers,
-    };
-  };
+  // export const setFilteredPassengers = (filteredPassengers) => {
+  //   console.log(filteredPassengers, "action filter")
+  //   return {
+  //     type: 'SET_FILTERED_PASSENGERS',
+  //     payload: filteredPassengers,
+  //   };
+  // };
   
 
   export const cancelEdit = (passengerId) => {

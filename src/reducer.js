@@ -85,8 +85,9 @@ const rootReducer = (state = initialState, action) => {
 
 
             case 'EDIT_PASSENGER':
+                console.log(state.filteredPassengers, " edit pass reducer")
                 return {
-                  ...state,
+                  state,
                   passengers: {
                     ...state.passengers,
                     data: state.passengers.data.map((passenger) =>
@@ -94,11 +95,19 @@ const rootReducer = (state = initialState, action) => {
                     ),
                   },
 
-            
+                  
                   filteredPassengers: state.filteredPassengers.map((passenger) =>
-                    passenger._id === action.payload ? { ...passenger, isEdit: true } : passenger
+                    passenger._id === action.payload ? { ...passenger, isEdit: true } :  { ...passenger, isEdit: false }
                   ),
                 };
+
+            // case 'SET_FILTERED_PASSENGERS':
+            //     console.log("SET FILTER" , action.payload)
+            //     return{
+            //         ...state,
+            //         filteredPassengers:action.payload,
+                    
+            //     };
               
               case 'CANCEL_EDIT':
                 return {

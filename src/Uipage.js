@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchPassenger, updatePassenger, editPassenger, cancelEdit, deletePassenger } from "./action";
+import { fetchPassenger, updatePassenger, editPassenger, cancelEdit, deletePassenger, setFilteredPassengers } from "./action";
 import { Button, Checkbox, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
@@ -42,21 +42,21 @@ function Uipage() {
   const [sortedFilterPassengers, setSortedFilterPassengers] = useState([]);
   const [sortedPassengerss, setSortedPassengerss] = useState([])
 
-
+  useEffect(() => {
+    console.log(sortedFilterPassengers, "from useEffect");
+  }, [sortedFilterPassengers]);
+  
 
 
 
   const dispatch = useDispatch();
   const passengers = useSelector((state) => state.passengers.data) || [];
   console.log(passengers, 'old ..')
-
   const sortedPassengers = passengers.slice().sort(getComparator(order, orderBy));
-
   const passengersss = useSelector((state) => state.filteredPassengers) || [];
   console.log(passengersss, " passengerss .. ")
-
   console.log(sortedFilterPassengers, " sorted data wich was filter..")
- 
+
 
 
 
@@ -71,19 +71,58 @@ function Uipage() {
 
 
 
-  const handleEdit = (passengerId) => {
-    dispatch(editPassenger(passengerId));
-    alert("edit will ")
-    console.log(passengers, " from edit fuction ")
-  };
+  // const handleEdit = (passengerId) => {
+  //   dispatch(editPassenger(passengerId));
+  //   alert("edit will ")
+  //   console.log(passengers, " from edit fuction ")
+  // }; 
 
+  const handleEdit = (passengerId) => {
+    const updatedPassengers = sortedFilterPassengers.map((passenger) =>
+      passenger._id === passengerId ? { ...passenger, isEdit: true } : { ...passenger, isEdit: false }
+    );
+    setSortedFilterPassengers(updatedPassengers);
+    dispatch(editPassenger(passengerId));
+    alert("Edit will be performed");
+    console.log(sortedFilterPassengers, "from edit function");
+  };
+  
+
+  // const handleCancelEdit = (passengerId) => {
+  //   dispatch(cancelEdit(passengerId));
+  // };
 
   const handleCancelEdit = (passengerId) => {
+    const updatedPassengers = sortedFilterPassengers.map((passenger) =>
+      passenger._id === passengerId ? { ...passenger, isEdit: false } : passenger
+    );
+    setSortedFilterPassengers(updatedPassengers);
     dispatch(cancelEdit(passengerId));
   };
 
 
 
+  // const handleUpdate = async (id) => {
+  //   const data = {
+  //     name: name,
+  //     trips: trips,
+  //     airline: airline
+  //   };
+  //   console.log(id, "id from ui page");
+  //   if (id) {
+  //     await dispatch(updatePassenger(id, data, airline));
+  //     setName("");
+  //     setTrips("");
+  //     setAirline("");
+  //     console.log(data, "new data");
+  //     console.log(airline, "AIRLINE new data");
+  //     alert("DATA UPDATED SUCCESSFULLY");
+
+  //     await dispatch(fetchPassenger());
+  //   } else {
+  //     console.log("Invalid passenger id");
+  //   }
+  // };
 
 
   const handleUpdate = async (id) => {
@@ -92,23 +131,28 @@ function Uipage() {
       trips: trips,
       airline: airline
     };
-    console.log(id, "id from ui page");
+  
     if (id) {
-      await dispatch(updatePassenger(id, data, airline));
+      const updatedPassengers = sortedFilterPassengers.map((passenger) =>
+        passenger._id === id ? { ...passenger, ...data, isEdit: false } : passenger
+      );
+
+      setSortedFilterPassengers(updatedPassengers);
+      await dispatch(updatePassenger(id, data, airline ));
       setName("");
       setTrips("");
       setAirline("");
       console.log(data, "new data");
       console.log(airline, "AIRLINE new data");
+      console.log(updatedPassengers , "updatedPassengers...new")
       alert("DATA UPDATED SUCCESSFULLY");
-
+  
       await dispatch(fetchPassenger());
     } else {
       console.log("Invalid passenger id");
     }
   };
-
-
+  
 
 
   const handleSelectAllClick = (event) => {
@@ -129,13 +173,15 @@ function Uipage() {
 
   const handleSelectPassenger = (passengerId) => {
     if (selectedPassengers.includes(passengerId)) {
-      setSelectedPassengers(selectedPassengers.filter((id) => id !== passengerId));
-      setSelectedCount(selectedCount - 1);
-      setSelectedPassengers([...selectedPassengers, passengerId]);
-      setSelectedCount(selectedCount + 1);
+      setSelectedPassengers([]);
+      setSelectedCount(0);
+    } else {
+      setSelectedPassengers([passengerId]);
+      setSelectedCount(1);
     }
     setIsSelectAll(false);
   };
+
 
 
 
@@ -223,22 +269,47 @@ function Uipage() {
     </Box>
   );
 
-
-
   const handleSearch = () => {
-    const filteredPassengers = passengers?.filter((passenger) =>
+    const filteredPassengers = passengers.filter((passenger) =>
       selectedAirlineNames.includes(passenger.airline[0].name) ||
       selectedAirlineCountries.includes(passenger.airline[0].country)
     );
-    const comparator = getComparator(order, orderBy);
-    const sortedPassengers = filteredPassengers.sort(comparator);
+
+    const sortedPassengers = filteredPassengers.slice().sort(getComparator(order, orderBy));
     setSortedFilterPassengers([...sortedPassengers]);
     setSelectedCount(0);
-    console.log(filteredPassengers)
-    console.log(sortedPassengers, " sooooo")
+    console.log(filteredPassengers);
+    console.log(sortedPassengers, "sooooo");
   };
- 
-  
+
+
+  // const handleSearch = () => {
+  //   const filteredPassengers = passengers?.filter((passenger) =>
+  //     selectedAirlineNames.includes(passenger.airline[0].name) ||
+  //     selectedAirlineCountries.includes(passenger.airline[0].country)
+  //   );
+
+
+  //   const comparator = getComparator(order, orderBy);
+  //   const sortedPassengers = filteredPassengers.sort(comparator);
+  //   setSortedFilterPassengers([...sortedPassengers]);
+  //   setSelectedCount(0);
+  //   console.log(filteredPassengers)
+  //   console.log(sortedPassengers, " sooooo")
+  // };
+
+  // const filteredPassengersWithKey = filteredPassengers.map((el) => ({
+  //   ...el,
+  //   isEdit: true
+  // }))
+  // dispatch({
+  //   type: 'SET_FILTERED_PASSENGERS',
+  //   payload: filteredPassengersWithKey
+  // })
+
+  // setFilteredPassengers(filteredPassengers)
+
+
 
 
 
@@ -250,7 +321,6 @@ function Uipage() {
       await dispatch(deletePassenger(selectedPassengerId));
     });
 
-
     const updatedFilterPassengers = sortedFilterPassengers.filter(
       (passenger) => !selectedPassengers.includes(passenger._id)
     );
@@ -258,11 +328,11 @@ function Uipage() {
     setSortedFilterPassengers(updatedFilterPassengers);
     setSelectedPassengers([]);
     setSelectedCount(0)
-    
+
     const remainingPassengers = passengers.filter(
       (passenger) => !selectedPassengers.includes(passenger._id)
     );
-  
+
     setSortedPassengerss(remainingPassengers);
   };
 
@@ -402,7 +472,6 @@ function Uipage() {
             </TableRow>
           </TableHead>
 
-
           <TableBody>
             {(sortedFilterPassengers && sortedFilterPassengers.length > 0
               ? sortedFilterPassengers
@@ -441,8 +510,6 @@ function Uipage() {
                       <TableCell colSpan={5}></TableCell>
                       <TableCell>
                         <Button onClick={() => handleCancelEdit(passenger._id)}> CANCEL </Button>
-                         
-                       
                       </TableCell>
                       <TableCell>
                         <Button onClick={() => handleUpdate(passenger._id)}>DONE</Button>
@@ -473,6 +540,7 @@ function Uipage() {
                 </TableRow>
               ))}
           </TableBody>
+
         </Table>
       </TableContainer>
 
